@@ -1,0 +1,40 @@
+     1                                  global _start
+     2                                  
+     3                                  section .data
+     4 00000000 48656C6C6F20576F72-     	str:	db 'Hello World!',0xA
+     5 00000009 6C64210A           
+     6                                  	strlen:	equ $-str
+     7                                  
+     8                                  section .text
+     9                                  _start:
+    10 00000000 5B                      	pop	ebx		; argc (argument count)
+    11 00000001 5B                      	pop	ebx		; argv[0] (program name)
+    12 00000002 5B                      	pop	ebx		; argv[1] (first real arg, in this case file name)
+    13                                  
+    14 00000003 B808000000              	mov	eax, 8		; sys_creat
+    15                                  				; file name already popped and stored in ebx
+    16 00000008 B9A4010000              	mov	ecx, 00644Q	; read/write permissions in octal (rw-rw-rw-)
+    17 0000000D CD80                    	int	0x80		; call the kernel
+    18                                  				; file descriptor now stored in eax
+    19                                  
+    20 0000000F 85C0                    	test	eax, eax	; make sure file descriptor is valid
+    21 00000011 7805                    	js	skipwrite	; check for sign flag (meaning file descriptor is < 0)
+    22                                  
+    23 00000013 E809000000              	call filewrite
+    24                                  
+    25                                  skipwrite:
+    26 00000018 89C3                    	mov	ebx, eax	; if there was an error, save errno in ebx
+    27 0000001A B801000000              	mov	eax, 1		; sys_exit
+    28 0000001F CD80                    	int	0x80
+    29                                  
+    30                                  filewrite:
+    31 00000021 89C3                    	mov	ebx, eax	; move file descriptor into ebx
+    32 00000023 B804000000              	mov	eax, 4		; sys_write
+    33 00000028 B9[00000000]            	mov	ecx, str	; put address of str into ecx
+    34 0000002D BA0D000000              	mov	edx, strlen	; put value of strlen into edx because it's a constant (defined with equ)
+    35 00000032 CD80                    	int	0x80
+    36                                  
+    37 00000034 B806000000              	mov	eax, 6		; sys_close
+    38                                  				; ebx already contains file descriptor
+    39 00000039 CD80                    	int	0x80
+    40 0000003B C3                      	ret

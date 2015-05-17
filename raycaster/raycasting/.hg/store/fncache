@@ -1,0 +1,5 @@
+data/src/quickcg.h.i
+data/obj/.hgempty.i
+data/Makefile.i
+data/src/quickcg.cpp.i
+data/src/raycaster_flat.cpp.i

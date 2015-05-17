@@ -1,0 +1,28 @@
+     1                                  ; nasm -f bin -o a.out teeny.asm -l teeny.lst
+     2                                  BITS 32
+     3                                  
+     4                                                org     0x00010000
+     5                                  
+     6 00000000 7F454C46                              db      0x7F, "ELF"             ; e_ident
+     7 00000004 01000000                              dd      1                                     ; p_type
+     8 00000008 00000000                              dd      0                                     ; p_offset
+     9 0000000C [00000000]                            dd      $$                                    ; p_vaddr
+    10 00000010 0200                                  dw      2                       ; e_type      ; p_addr
+    11 00000012 0300                                  dw      3                       ; e_machine
+    12 00000014 [20000000]                            dd      _start                  ; e_version   ; p_filesz
+    13 00000018 [20000000]                            dd      _start                  ; e_entry     ; p_memsz
+    14 0000001C 04000000                              dd      4                       ; e_phoff     ; p_flags
+    15                                  _start:
+    16 00000020 B32A                                  mov     bl, 42                  ; e_shoff     ; p_align
+    17 00000022 31C0                                  xor     eax, eax
+    18 00000024 40                                    inc     eax                     ; e_flags
+    19 00000025 CD80                                  int     0x80
+    20 00000027 00                                    db      0
+    21 00000028 3400                                  dw      0x34                    ; e_ehsize
+    22 0000002A 2000                                  dw      0x20                    ; e_phentsize
+    23 0000002C 01                                    db      1                       ; e_phnum
+    24                                                                                ; e_shentsize
+    25                                                                                ; e_shnum
+    26                                                                                ; e_shstrndx
+    27                                  
+    28                                  filesize      equ     $ - $$
